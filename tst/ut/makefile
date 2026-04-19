@@ -30,6 +30,11 @@ xml_parser_SUT.cpp.so,SRCS := parser/xml_parser.cpp
 xml_parser_SUT.cpp.so,DEPS :=
 xml_parser_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
 
+X86CPPTARGETSOL += xml_writer_SUT.cpp.so
+xml_writer_SUT.cpp.so,SRCS := parser/xml_writer.cpp
+xml_writer_SUT.cpp.so,DEPS :=
+xml_writer_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
+
 # core
 
 X86CPPTARGETSOL += config_SUT.cpp.so
@@ -54,7 +59,8 @@ loader_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
 X86CPPTARGETSOL += writer_SUT.cpp.so
 writer_SUT.cpp.so,SRCS := writer.cpp
 writer_SUT.cpp.so,DEPS := \
-	acf_writer_SUT.cpp.so
+	acf_writer_SUT.cpp.so \
+	xml_writer_SUT.cpp.so
 writer_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
 
 # ------------------------------

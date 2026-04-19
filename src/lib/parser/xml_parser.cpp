@@ -40,6 +40,60 @@ std::string POLYCONF_xml_trim(const std::string& text)
     return text.substr(start, end - start);
 }
 
+//
+//!\brief Decode XML text entities
+//
+std::string POLYCONF_xml_unescape_text(const std::string& text)
+{
+    std::string output;
+    std::size_t i = 0;
+
+    output.reserve(text.size());
+
+    while (i < text.size())
+    {
+        if (text.compare(i, 5, "&amp;") == 0)
+        {
+            output.push_back('&');
+            i += 5;
+            continue;
+        }
+
+        if (text.compare(i, 4, "&lt;") == 0)
+        {
+            output.push_back('<');
+            i += 4;
+            continue;
+        }
+
+        if (text.compare(i, 4, "&gt;") == 0)
+        {
+            output.push_back('>');
+            i += 4;
+            continue;
+        }
+
+        if (text.compare(i, 6, "&quot;") == 0)
+        {
+            output.push_back('"');
+            i += 6;
+            continue;
+        }
+
+        if (text.compare(i, 6, "&apos;") == 0)
+        {
+            output.push_back('\'');
+            i += 6;
+            continue;
+        }
+
+        output.push_back(text[i]);
+        ++i;
+    }
+
+    return output;
+}
+
 class POLYCONF_XML_READER final
 {
 private:
@@ -369,7 +423,7 @@ private:
 
         if (!text.empty())
         {
-            node.set_value(text);
+            node.set_value(POLYCONF_xml_unescape_text(text));
         }
 
         return std::make_pair(name, node);

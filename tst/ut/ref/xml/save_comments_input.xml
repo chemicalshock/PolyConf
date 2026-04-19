@@ -1,0 +1,8 @@
+<!-- Account settings -->
+<account>
+    <!-- Display name -->
+    <name>colin stewart</name>
+    <!-- Feature flag -->
+    <developer>true</developer>
+    <!-- End of account -->
+</account>

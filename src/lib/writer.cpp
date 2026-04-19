@@ -14,6 +14,7 @@
 
 // internal
 #include "parser/acf_writer.hpp"
+#include "parser/xml_writer.hpp"
 
 //
 //!\brief Save configuration to string
@@ -24,6 +25,9 @@ std::string POLYCONF::save_string(const POLYCONF::CONFIG& config, POLYCONF::FORM
     {
         case POLYCONF::FORMAT::ACF:
             return POLYCONF::write_acf(config);
+
+        case POLYCONF::FORMAT::XML:
+            return POLYCONF::write_xml(config);
 
         default:
             return std::string();

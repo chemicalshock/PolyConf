@@ -33,6 +33,20 @@ SHOCKTEST_GOODWEATHER(save_string_writes_basic_acf)
     EXPECT_EQ(string_matches_ref(output, "ref/acf/auto_detect_basic.acf"), true);
 }
 
+SHOCKTEST_GOODWEATHER(save_string_writes_basic_xml)
+{
+    const char* input =
+        "<account>"
+            "<name>colin</name>"
+            "<developer>true</developer>"
+        "</account>";
+
+    POLYCONF::CONFIG config = POLYCONF::load_string(input, POLYCONF::FORMAT::XML);
+    std::string output = POLYCONF::save_string(config, POLYCONF::FORMAT::XML);
+
+    EXPECT_EQ(string_matches_ref(output, "ref/xml/auto_detect_basic.xml"), true);
+}
+
 SHOCKTEST_GOODWEATHER(save_string_round_trips_acf)
 {
     const char* input =
@@ -53,6 +67,24 @@ SHOCKTEST_GOODWEATHER(save_string_round_trips_acf)
     EXPECT_EQ(reloaded.get_bool("account[1].info.is_active", false), true);
 }
 
+SHOCKTEST_GOODWEATHER(save_string_round_trips_xml)
+{
+    const char* input =
+        "<account>"
+            "<name>colin</name>"
+            "<developer>true</developer>"
+            "<info><is_active>true</is_active></info>"
+        "</account>";
+
+    POLYCONF::CONFIG config = POLYCONF::load_string(input, POLYCONF::FORMAT::XML);
+    std::string output = POLYCONF::save_string(config, POLYCONF::FORMAT::XML);
+    POLYCONF::CONFIG reloaded = POLYCONF::load_string(output, POLYCONF::FORMAT::XML);
+
+    EXPECT_EQ(reloaded.get_string("account.name", ""), "colin");
+    EXPECT_EQ(reloaded.get_bool("account.developer", false), true);
+    EXPECT_EQ(reloaded.get_bool("account.info.is_active", false), true);
+}
+
 SHOCKTEST_GOODWEATHER(save_string_quotes_values_when_needed)
 {
     const char* input =
@@ -69,6 +101,23 @@ SHOCKTEST_GOODWEATHER(save_string_quotes_values_when_needed)
     EXPECT_EQ(string_matches_ref(output, "ref/acf/save_quotes_expected.acf"), true);
 }
 
+SHOCKTEST_GOODWEATHER(save_string_escapes_xml_values)
+{
+    const char* input =
+        "<account>"
+            "<name>colin &amp; co</name>"
+            "<title>dev &lt; one &gt; two</title>"
+        "</account>";
+
+    POLYCONF::CONFIG config = POLYCONF::load_string(input, POLYCONF::FORMAT::XML);
+    std::string output = POLYCONF::save_string(config, POLYCONF::FORMAT::XML);
+    POLYCONF::CONFIG reloaded = POLYCONF::load_string(output, POLYCONF::FORMAT::XML);
+
+    EXPECT_EQ(reloaded.get_string("account.name", ""), "colin & co");
+    EXPECT_EQ(reloaded.get_string("account.title", ""), "dev < one > two");
+    EXPECT_EQ(string_matches_ref(output, "ref/xml/save_escaped_expected.xml"), true);
+}
+
 SHOCKTEST_GOODWEATHER(save_preserves_acf_comments_loaded_from_file)
 {
     POLYCONF::CONFIG config = POLYCONF::load_file("ref/acf/save_comments_input.acf", POLYCONF::FORMAT::ACF);
@@ -77,6 +126,16 @@ SHOCKTEST_GOODWEATHER(save_preserves_acf_comments_loaded_from_file)
     EXPECT_EQ(config.get_string("account.name", ""), "colin stewart");
     EXPECT_EQ(config.get_bool("account.developer", false), true);
     EXPECT_EQ(string_matches_ref(output, "ref/acf/save_comments_input.acf"), true);
+}
+
+SHOCKTEST_GOODWEATHER(save_preserves_xml_comments_loaded_from_file)
+{
+    POLYCONF::CONFIG config = POLYCONF::load_file("ref/xml/save_comments_input.xml", POLYCONF::FORMAT::XML);
+    std::string output = POLYCONF::save_string(config, POLYCONF::FORMAT::XML);
+
+    EXPECT_EQ(config.get_string("account.name", ""), "colin stewart");
+    EXPECT_EQ(config.get_bool("account.developer", false), true);
+    EXPECT_EQ(string_matches_ref(output, "ref/xml/save_comments_input.xml"), true);
 }
 
 SHOCKTEST_GOODWEATHER(save_file_writes_acf_file)
