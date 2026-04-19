@@ -1,14 +1,24 @@
-// --------------------------------------------------------------------
+// -------------------------------------------------------------
 //
 //!\file acf_parser.hpp
-//!\brief ACF parser
+//!\brief ACF parser for Polyconf
 //!\author Colin J.D. Stewart
 //
-// Copyright (c) 2026 Colin J.D. Stewart. All rights reserved.
-//
-// --------------------------------------------------------------------
+// -------------------------------------------------------------
 
-#ifndef ACF_PARSER_HPP
-#define ACF_PARSER_HPP
+#ifndef POLYCONF_ACF_PARSER_HPP
+#define POLYCONF_ACF_PARSER_HPP
 
-#endif // ACF_PARSER_HPP
+// inbuilt
+#include <string>
+
+// internal
+#include "config.hpp"
+
+namespace POLYCONF
+{
+    //!\brief Parse ACF input into a configuration object
+    CONFIG parse_acf(const std::string& input);
+}
+
+#endif // POLYCONF_ACF_PARSER_HPP
