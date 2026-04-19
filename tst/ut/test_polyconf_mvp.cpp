@@ -42,20 +42,16 @@ SHOCKTEST_GOODWEATHER(mvp_acf_basic_smoke)
 
 SHOCKTEST_GOODWEATHER(mvp_xml_basic_smoke)
 {
-    // TODO:
-    //
-    // const char* input =
-    //     "<config>"
-    //         "<value>"
-    //             "<name>test</name>"
-    //         "</value>"
-    //     "</config>";
-    //
-    // POLYCONF::CONFIG config = POLYCONF::load_string(input, POLYCONF::FORMAT::XML);
-    //
-    // EXPECT_EQ(config.get_string("config.value.name", ""), "test");
-
-    EXPECT_EQ(1, 1);
+    const char* input =
+        "<config>"
+            "<value>"
+                "<name>test</name>"
+            "</value>"
+        "</config>";
+    
+    POLYCONF::CONFIG config = POLYCONF::load_string(input, POLYCONF::FORMAT::XML);
+    
+    EXPECT_EQ(config.get_string("config.value.name", ""), "test");
 }
 
 // -------------------------------------------------------------
