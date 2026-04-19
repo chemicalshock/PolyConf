@@ -17,7 +17,9 @@ X86CPPTARGETSOL += config_SUT.cpp.so
 config_SUT.cpp.so,SRCS := config.cpp
 config_SUT.cpp.so,DEPS := \
 	path_SUT.cpp.so \
-	acf_parser_SUT.cpp.so
+	\
+	acf_parser_SUT.cpp.so \
+	xml_parser_SUT.cpp.so
 config_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
 
 X86CPPTARGETSOL += path_SUT.cpp.so
@@ -25,15 +27,22 @@ path_SUT.cpp.so,SRCS := path.cpp
 path_SUT.cpp.so,DEPS :=
 path_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
 
+X86CPPTARGETSOL += loader_SUT.cpp.so
+loader_SUT.cpp.so,SRCS := loader.cpp
+loader_SUT.cpp.so,DEPS :=
+loader_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
+
+# parsers
+
 X86CPPTARGETSOL += acf_parser_SUT.cpp.so
 acf_parser_SUT.cpp.so,SRCS := parser/acf_parser.cpp
 acf_parser_SUT.cpp.so,DEPS :=
 acf_parser_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
 
-X86CPPTARGETSOL += loader_SUT.cpp.so
-loader_SUT.cpp.so,SRCS := loader.cpp
-loader_SUT.cpp.so,DEPS :=
-loader_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
+X86CPPTARGETSOL += xml_parser_SUT.cpp.so
+xml_parser_SUT.cpp.so,SRCS := parser/xml_parser.cpp
+xml_parser_SUT.cpp.so,DEPS :=
+xml_parser_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
 
 # ------------------------------
 # Test targets
@@ -79,6 +88,15 @@ TEST_ACF_PARSER,USRLIBS := \
 	loader_SUT.cpp.so
 TEST_ACF_PARSER,CPPFLAGS = $(GLOBAL_CPPFLAGS)
 TEST_ACF_PARSER,LDFLAGS =
+
+X86CPPTARGET += TEST_XML_PARSER
+TEST_XML_PARSER,SRCS := test_xml_parser.cpp
+TEST_XML_PARSER,USRLIBS := \
+	config_SUT.cpp.so \
+	loader_SUT.cpp.so
+TEST_XML_PARSER,CPPFLAGS = $(GLOBAL_CPPFLAGS)
+TEST_XML_PARSER,LDFLAGS =
+
 
 # Include shocktest makefile from dep/shocktest symlink (no absolute path).
 include $(REPO_ROOT)/dep/shocktest/src/tst/ut/makefile.shocktest.mk

@@ -20,8 +20,8 @@ namespace POLYCONF
     {
         AUTO = 0,
         ACF,
-        //INI,
-        //XML,
+        XML,
+        //INI,        
         //JSON,
         //YAML
     };

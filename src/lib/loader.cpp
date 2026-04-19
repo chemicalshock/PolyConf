@@ -16,6 +16,8 @@
 
 // internal
 #include "parser/acf_parser.hpp"
+#include "parser/xml_parser.hpp"
+
 
 //
 //!\brief Load configuration from string
@@ -26,6 +28,9 @@ POLYCONF::CONFIG POLYCONF::load_string(const std::string& input, POLYCONF::FORMA
     {
         case POLYCONF::FORMAT::ACF:
             return POLYCONF::parse_acf(input);
+
+        case POLYCONF::FORMAT::XML:
+            return POLYCONF::parse_xml(input);            
 
         default:
             return POLYCONF::CONFIG();
