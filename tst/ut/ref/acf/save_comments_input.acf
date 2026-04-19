@@ -1,0 +1,7 @@
+# Account settings
+.account # user account
+# Display name
+name = "colin stewart" # full name
+# Feature flag
+developer = true
+# End of account

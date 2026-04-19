@@ -41,28 +41,77 @@ std::string POLYCONF_acf_trim(const std::string& text)
 }
 
 //
-//!\brief Remove inline comment from a line
+//!\brief Find inline comment marker outside quoted strings
 //
-std::string POLYCONF_acf_strip_comment(const std::string& text)
+std::size_t POLYCONF_acf_find_comment(const std::string& text)
 {
+    bool escaped = false;
     bool in_quotes = false;
     std::size_t i = 0;
 
     while (i < text.size())
     {
-        if (text[i] == '"')
+        if (escaped)
+        {
+            escaped = false;
+        }
+        else if (text[i] == '\\' && in_quotes)
+        {
+            escaped = true;
+        }
+        else if (text[i] == '"')
         {
             in_quotes = !in_quotes;
         }
         else if (text[i] == '#' && !in_quotes)
         {
-            return text.substr(0, i);
+            return i;
         }
 
         ++i;
     }
 
-    return text;
+    return std::string::npos;
+}
+
+//
+//!\brief Split ACF line into content and optional comment text
+//
+void POLYCONF_acf_split_comment(
+    const std::string& line,
+    std::string& content,
+    std::string& comment,
+    bool& has_comment)
+{
+    std::size_t pos = POLYCONF_acf_find_comment(line);
+
+    if (pos == std::string::npos)
+    {
+        content = line;
+        comment.clear();
+        has_comment = false;
+        return;
+    }
+
+    content = line.substr(0, pos);
+    comment = POLYCONF_acf_trim(line.substr(pos + 1));
+    has_comment = true;
+}
+
+//
+//!\brief Attach pending comments to a parsed node
+//
+void POLYCONF_acf_apply_pending_comments(POLYCONF::NODE& node, std::vector<std::string>& pending_comments)
+{
+    std::size_t i = 0;
+
+    while (i < pending_comments.size())
+    {
+        node.add_comment_before(std::move(pending_comments[i]));
+        ++i;
+    }
+
+    pending_comments.clear();
 }
 
 //
@@ -153,16 +202,27 @@ POLYCONF::CONFIG POLYCONF::parse_acf(const std::string& input)
 {
     POLYCONF::NODE root;
     POLYCONF::NODE* current = &root;
+    std::vector<std::string> pending_comments;
     std::istringstream stream(input);
     std::string line;
 
     while (std::getline(stream, line))
     {
-        std::string stripped = POLYCONF_acf_strip_comment(line);
-        std::string trimmed = POLYCONF_acf_trim(stripped);
+        std::string content;
+        std::string comment;
+        bool has_comment = false;
+        std::string trimmed;
+
+        POLYCONF_acf_split_comment(line, content, comment, has_comment);
+        trimmed = POLYCONF_acf_trim(content);
 
         if (trimmed.empty())
         {
+            if (has_comment)
+            {
+                pending_comments.push_back(std::move(comment));
+            }
+
             continue;
         }
 
@@ -177,6 +237,13 @@ POLYCONF::CONFIG POLYCONF::parse_acf(const std::string& input)
             }
 
             current = POLYCONF_acf_open_section(root, parts);
+            POLYCONF_acf_apply_pending_comments(*current, pending_comments);
+
+            if (has_comment)
+            {
+                current->set_inline_comment(std::move(comment));
+            }
+
             continue;
         }
 
@@ -198,7 +265,24 @@ POLYCONF::CONFIG POLYCONF::parse_acf(const std::string& input)
             }
 
             child.set_value(POLYCONF_acf_unquote(value));
+            POLYCONF_acf_apply_pending_comments(child, pending_comments);
+
+            if (has_comment)
+            {
+                child.set_inline_comment(std::move(comment));
+            }
+
             current->add_child(key, std::move(child));
+        }
+    }
+
+    {
+        std::size_t i = 0;
+
+        while (i < pending_comments.size())
+        {
+            root.add_trailing_comment(std::move(pending_comments[i]));
+            ++i;
         }
     }
 

@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <vector>
 
 // internal
 #include "node.hpp"
@@ -44,6 +45,7 @@ class POLYCONF_XML_READER final
 private:
     const std::string& m_input;
     std::size_t m_pos = 0;
+    std::vector<std::string> m_pending_comments;
 
 public:
     //
@@ -70,6 +72,8 @@ public:
             root.add_child(element.first, std::move(element.second));
             skip_misc();
         }
+
+        apply_pending_as_trailing_comments(root);
 
         return root;
     }
@@ -160,11 +164,12 @@ private:
     }
 
     //
-    //!\brief Skip XML comment
+    //!\brief Read XML comment text
     //
-    void skip_comment()
+    std::string read_comment()
     {
-        std::size_t end = m_input.find("-->", m_pos);
+        std::size_t start = m_pos + 4;
+        std::size_t end = m_input.find("-->", start);
 
         if (end == std::string::npos)
         {
@@ -172,6 +177,39 @@ private:
         }
 
         m_pos = end + 3;
+        return POLYCONF_xml_trim(m_input.substr(start, end - start));
+    }
+
+    //
+    //!\brief Attach pending comments before a node
+    //
+    void apply_pending_as_leading_comments(POLYCONF::NODE& node)
+    {
+        std::size_t i = 0;
+
+        while (i < m_pending_comments.size())
+        {
+            node.add_comment_before(std::move(m_pending_comments[i]));
+            ++i;
+        }
+
+        m_pending_comments.clear();
+    }
+
+    //
+    //!\brief Attach pending comments after a node
+    //
+    void apply_pending_as_trailing_comments(POLYCONF::NODE& node)
+    {
+        std::size_t i = 0;
+
+        while (i < m_pending_comments.size())
+        {
+            node.add_trailing_comment(std::move(m_pending_comments[i]));
+            ++i;
+        }
+
+        m_pending_comments.clear();
     }
 
     //
@@ -196,7 +234,7 @@ private:
 
             if (starts_with("<!--"))
             {
-                skip_comment();
+                m_pending_comments.push_back(read_comment());
                 changed = true;
                 continue;
             }
@@ -277,6 +315,7 @@ private:
 
         expect('<');
         name = parse_name();
+        apply_pending_as_leading_comments(node);
 
         skip_attributes();
 
@@ -292,7 +331,7 @@ private:
         {
             if (starts_with("<!--"))
             {
-                skip_comment();
+                m_pending_comments.push_back(read_comment());
                 continue;
             }
 
@@ -310,6 +349,7 @@ private:
                     throw std::runtime_error("XML parse error: mismatched closing tag");
                 }
 
+                apply_pending_as_trailing_comments(node);
                 break;
             }
 

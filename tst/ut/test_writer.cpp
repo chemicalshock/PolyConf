@@ -69,6 +69,16 @@ SHOCKTEST_GOODWEATHER(save_string_quotes_values_when_needed)
     EXPECT_EQ(string_matches_ref(output, "ref/acf/save_quotes_expected.acf"), true);
 }
 
+SHOCKTEST_GOODWEATHER(save_preserves_acf_comments_loaded_from_file)
+{
+    POLYCONF::CONFIG config = POLYCONF::load_file("ref/acf/save_comments_input.acf", POLYCONF::FORMAT::ACF);
+    std::string output = POLYCONF::save_string(config, POLYCONF::FORMAT::ACF);
+
+    EXPECT_EQ(config.get_string("account.name", ""), "colin stewart");
+    EXPECT_EQ(config.get_bool("account.developer", false), true);
+    EXPECT_EQ(string_matches_ref(output, "ref/acf/save_comments_input.acf"), true);
+}
+
 SHOCKTEST_GOODWEATHER(save_file_writes_acf_file)
 {
     const char* input =

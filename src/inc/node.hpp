@@ -23,6 +23,10 @@ namespace POLYCONF
     private:
         bool m_has_value = false;
         std::string m_value;
+        std::vector<std::string> m_comments_before;
+        bool m_has_inline_comment = false;
+        std::string m_inline_comment;
+        std::vector<std::string> m_trailing_comments;
         std::map<std::string, std::vector<NODE>> m_children;
         std::vector<std::pair<std::string, std::size_t>> m_child_order;
 
@@ -68,6 +72,68 @@ namespace POLYCONF
         bool has_value() const
         {
             return m_has_value;
+        }
+
+        //!\brief Add comment text that appears before this node
+        void add_comment_before(const std::string& comment)
+        {
+            m_comments_before.push_back(comment);
+        }
+
+        //!\brief Add comment text that appears before this node (move)
+        void add_comment_before(std::string&& comment)
+        {
+            m_comments_before.push_back(std::move(comment));
+        }
+
+        //!\brief Access comment text that appears before this node
+        const std::vector<std::string>& comments_before() const
+        {
+            return m_comments_before;
+        }
+
+        //!\brief Set inline comment text for this node
+        void set_inline_comment(const std::string& comment)
+        {
+            m_inline_comment = comment;
+            m_has_inline_comment = true;
+        }
+
+        //!\brief Set inline comment text for this node (move)
+        void set_inline_comment(std::string&& comment)
+        {
+            m_inline_comment = std::move(comment);
+            m_has_inline_comment = true;
+        }
+
+        //!\brief Check whether this node has inline comment text
+        bool has_inline_comment() const
+        {
+            return m_has_inline_comment;
+        }
+
+        //!\brief Access inline comment text for this node
+        const std::string& inline_comment() const
+        {
+            return m_inline_comment;
+        }
+
+        //!\brief Add trailing comment text for this node
+        void add_trailing_comment(const std::string& comment)
+        {
+            m_trailing_comments.push_back(comment);
+        }
+
+        //!\brief Add trailing comment text for this node (move)
+        void add_trailing_comment(std::string&& comment)
+        {
+            m_trailing_comments.push_back(std::move(comment));
+        }
+
+        //!\brief Access trailing comment text for this node
+        const std::vector<std::string>& trailing_comments() const
+        {
+            return m_trailing_comments;
         }
 
         //!\brief Add named child node

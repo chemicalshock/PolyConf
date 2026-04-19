@@ -92,9 +92,58 @@ std::string POLYCONF_acf_escape_value(const std::string& value)
 //
 //!\brief Write one scalar entry
 //
+void POLYCONF_acf_write_comment_line(std::ostringstream& stream, const std::string& comment)
+{
+    stream << "#";
+
+    if (!comment.empty())
+    {
+        stream << " " << comment;
+    }
+
+    stream << "\n";
+}
+
+//
+//!\brief Write leading comment lines for a node
+//
+void POLYCONF_acf_write_comments(std::ostringstream& stream, const std::vector<std::string>& comments)
+{
+    std::size_t i = 0;
+
+    while (i < comments.size())
+    {
+        POLYCONF_acf_write_comment_line(stream, comments[i]);
+        ++i;
+    }
+}
+
+//
+//!\brief Write an inline comment for a node when present
+//
+void POLYCONF_acf_write_inline_comment(std::ostringstream& stream, const POLYCONF::NODE& node)
+{
+    if (!node.has_inline_comment())
+    {
+        return;
+    }
+
+    stream << " #";
+
+    if (!node.inline_comment().empty())
+    {
+        stream << " " << node.inline_comment();
+    }
+}
+
+//
+//!\brief Write one scalar entry
+//
 void POLYCONF_acf_write_scalar(std::ostringstream& stream, const std::string& key, const POLYCONF::NODE& node)
 {
     std::string value = node.value();
+
+    POLYCONF_acf_write_comments(stream, node.comments_before());
 
     stream << key << " = ";
 
@@ -107,6 +156,7 @@ void POLYCONF_acf_write_scalar(std::ostringstream& stream, const std::string& ke
         stream << value;
     }
 
+    POLYCONF_acf_write_inline_comment(stream, node);
     stream << "\n";
 }
 
@@ -146,7 +196,10 @@ void POLYCONF_acf_write_section_node(
 
     if (!path_parts.empty())
     {
-        stream << "." << POLYCONF_acf_join_path(path_parts) << "\n";
+        POLYCONF_acf_write_comments(stream, node.comments_before());
+        stream << "." << POLYCONF_acf_join_path(path_parts);
+        POLYCONF_acf_write_inline_comment(stream, node);
+        stream << "\n";
     }
 
     while (i < child_order.size())
@@ -185,6 +238,8 @@ void POLYCONF_acf_write_section_node(
 
         ++i;
     }
+
+    POLYCONF_acf_write_comments(stream, node.trailing_comments());
 }
 
 //
@@ -212,6 +267,8 @@ std::string POLYCONF::write_acf(const POLYCONF::CONFIG& config)
 
         ++i;
     }
+
+    POLYCONF_acf_write_comments(stream, config.root().trailing_comments());
 
     return stream.str();
 }
