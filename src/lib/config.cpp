@@ -146,12 +146,22 @@ bool POLYCONF::CONFIG::get_bool(const std::string& path, bool default_value) con
 
     value = &(node->value());
 
-    if (*value == "true" || *value == "1" || *value == "yes" || *value == "on")
+    std::string lower;
+    std::size_t i;
+
+    lower.reserve(value->size());
+
+    for (i = 0; i < value->size(); ++i)
+    {
+        lower.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>((*value)[i]))));
+    }
+
+    if (lower == "true" || lower == "1" || lower == "yes" || lower == "on")
     {
         return true;
     }
 
-    if (*value == "false" || *value == "0" || *value == "no" || *value == "off")
+    if (lower == "false" || lower == "0" || lower == "no" || lower == "off")
     {
         return false;
     }

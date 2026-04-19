@@ -136,3 +136,14 @@ SHOCKTEST_GOODWEATHER(acf_invalid_conversion_returns_default)
     EXPECT_EQ(config.get_int("server.addr", 7), 7);
     EXPECT_EQ(config.get_bool("server.enabled", false), false);
 }
+
+SHOCKTEST_GOODWEATHER(acf_auto_detect_defaults_to_acf)
+{
+    const char* input =
+        ".server\n"
+        "addr = localhost\n";
+
+    POLYCONF::CONFIG config = POLYCONF::load_string(input, POLYCONF::FORMAT::AUTO);
+
+    EXPECT_EQ(config.get_string("server.addr", ""), "localhost");
+}

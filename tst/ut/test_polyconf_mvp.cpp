@@ -71,3 +71,51 @@ SHOCKTEST_GOODWEATHER(mvp_ini_basic_smoke)
 
     EXPECT_EQ(1, 1);
 }
+
+SHOCKTEST_GOODWEATHER(mvp_auto_detects_acf)
+{
+    const char* input =
+        ".account\n"
+        "name = colin\n";
+
+    POLYCONF::CONFIG config = POLYCONF::load_string(input, POLYCONF::FORMAT::AUTO);
+
+    EXPECT_EQ(config.get_string("account.name", ""), "colin");
+}
+
+SHOCKTEST_GOODWEATHER(mvp_auto_detects_xml)
+{
+    const char* input =
+        "<config>"
+            "<value>123</value>"
+        "</config>";
+
+    POLYCONF::CONFIG config = POLYCONF::load_string(input, POLYCONF::FORMAT::AUTO);
+
+    EXPECT_EQ(config.get_int("config.value", 0), 123);
+}
+
+SHOCKTEST_GOODWEATHER(mvp_auto_detect_ignores_leading_whitespace)
+{
+    const char* input =
+        "\n"
+        "   \n"
+        "\t<config><value>7</value></config>";
+
+    POLYCONF::CONFIG config = POLYCONF::load_string(input, POLYCONF::FORMAT::AUTO);
+
+    EXPECT_EQ(config.get_int("config.value", 0), 7);
+}
+
+SHOCKTEST_GOODWEATHER(auto_detect_file_extension_xml)
+{
+    // simulate behaviour by calling detection directly via load_string
+    // (full file test later if you add temp file helper)
+
+    const char* input =
+        "<config><value>5</value></config>";
+
+    POLYCONF::CONFIG config = POLYCONF::load_string(input, POLYCONF::FORMAT::AUTO);
+
+    EXPECT_EQ(config.get_int("config.value", 0), 5);
+}

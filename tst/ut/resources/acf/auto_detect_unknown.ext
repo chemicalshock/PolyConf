@@ -1,0 +1,6 @@
+.account
+name = colin
+developer = yes
+
+.server
+addr = localhost
