@@ -2,7 +2,10 @@
 # makefile for shocktest unit tests
 #
 UT_MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-REPO_ROOT := $(abspath $(UT_MAKEFILE_DIR)/../../..)
+repo_root_has_project_shape = $(if $(wildcard $(1)/src/inc),$(1))
+REPO_ROOT_CANDIDATES := $(abspath $(UT_MAKEFILE_DIR)/../..) $(abspath $(UT_MAKEFILE_DIR)/../../..)
+DETECTED_REPO_ROOT := $(firstword $(foreach dir,$(REPO_ROOT_CANDIDATES),$(if $(call repo_root_has_project_shape,$(dir)),$(dir))))
+REPO_ROOT := $(if $(DETECTED_REPO_ROOT),$(DETECTED_REPO_ROOT),$(firstword $(REPO_ROOT_CANDIDATES)))
 
 X86CPPTARGETSOL ?=
 
@@ -18,11 +21,11 @@ X86CPPTARGETSOL ?=
 # ------------------------------
 # Test targets
 # ------------------------------
-# X86CPPTARGET += TEST_CONNECTION_BUFFER
-# TEST_CONNECTION_BUFFER,SRCS = $(UT_MAKEFILE_DIR)/test_connection_buffer.cpp
-# TEST_CONNECTION_BUFFER,USRLIBS = connection_buffer_SUT.cpp.so
-# TEST_CONNECTION_BUFFER,CPPFLAGS = $(GLOBAL_CPPFLAGS)
-# TEST_CONNECTION_BUFFER,LDFLAGS =
+X86CPPTARGET += TEST_POLYCONF_MVP
+TEST_POLYCONF_MVP,SRCS := test_polyconf_mvp.cpp
+TEST_POLYCONF_MVP,USRLIBS :=
+TEST_POLYCONF_MVP,CPPFLAGS = $(GLOBAL_CPPFLAGS)
+TEST_POLYCONF_MVP,LDFLAGS =
 
 # Include shocktest makefile from dep/shocktest symlink (no absolute path).
 include $(REPO_ROOT)/dep/shocktest/src/tst/ut/makefile.shocktest.mk
