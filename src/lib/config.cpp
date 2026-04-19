@@ -10,6 +10,7 @@
 #include "config.hpp"
 
 // inbuilt
+#include <cstddef>
 #include <cstdlib>
 #include <utility>
 
@@ -204,6 +205,54 @@ bool POLYCONF::CONFIG::has(const std::string& path) const
     }
 
     return (node != nullptr);
+}
+
+//
+//!\brief Get number of matching nodes at path
+//
+std::size_t POLYCONF::CONFIG::count(const std::string& path) const
+{
+    POLYCONF::PATH parsed;
+    const std::vector<POLYCONF::PATH_SEGMENT>& segments = parsed.segments();
+    const POLYCONF::NODE* current = &m_root;
+    std::size_t i = 0;
+
+    try
+    {
+        parsed = POLYCONF::parse_path(path);
+    }
+    catch (...)
+    {
+        return 0;
+    }
+
+    if (segments.empty())
+    {
+        return 0;
+    }
+
+    while ((i + 1) < segments.size())
+    {
+        current = current->get_child(segments[i].name, segments[i].index);
+
+        if (current == nullptr)
+        {
+            return 0;
+        }
+
+        ++i;
+    }
+
+    {
+        const std::vector<POLYCONF::NODE>* children = current->get_children(segments.back().name);
+
+        if (children == nullptr)
+        {
+            return 0;
+        }
+
+        return children->size();
+    }
 }
 
 //

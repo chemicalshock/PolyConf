@@ -76,6 +76,9 @@ SHOCKTEST_GOODWEATHER(acf_subsection_attaches_to_latest_parent)
     EXPECT_EQ(config.get_string("account.name", ""), "colin");
     EXPECT_EQ(config.get_string("account[1].name", ""), "orim");
     EXPECT_EQ(config.get_bool("account[1].info.is_agent", false), true);
+    EXPECT_EQ(config.count("account"), 2);
+    EXPECT_EQ(config.count("account.info"), 0);
+    EXPECT_EQ(config.count("account[1].info"), 1);
     EXPECT_EQ(config.has("account.info.is_agent"), false);
 }
 
@@ -105,4 +108,31 @@ SHOCKTEST_GOODWEATHER(acf_inline_comments_are_ignored)
     EXPECT_EQ(config.get_string("server.addr", ""), "localhost");
     EXPECT_EQ(config.get_int("server.port", 0), 1234);
     EXPECT_EQ(config.get_string("server.name", ""), "web # not comment");
+}
+
+SHOCKTEST_GOODWEATHER(acf_missing_path_returns_default)
+{
+    const char* input =
+        ".server\n"
+        "addr = localhost\n";
+
+    POLYCONF::CONFIG config = POLYCONF::load_string(input, POLYCONF::FORMAT::ACF);
+
+    EXPECT_EQ(config.get_string("server.missing", "fallback"), "fallback");
+    EXPECT_EQ(config.get_int("server.port", 8080), 8080);
+    EXPECT_EQ(config.get_bool("server.enabled", true), true);
+    EXPECT_EQ(config.count("server.missing"), 0);
+}
+
+SHOCKTEST_GOODWEATHER(acf_invalid_conversion_returns_default)
+{
+    const char* input =
+        ".server\n"
+        "addr = localhost\n"
+        "enabled = maybe\n";
+
+    POLYCONF::CONFIG config = POLYCONF::load_string(input, POLYCONF::FORMAT::ACF);
+
+    EXPECT_EQ(config.get_int("server.addr", 7), 7);
+    EXPECT_EQ(config.get_bool("server.enabled", false), false);
 }
