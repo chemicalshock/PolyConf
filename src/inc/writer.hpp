@@ -1,30 +1,23 @@
 // -------------------------------------------------------------
 //
-//!\file polyconf.hpp
-//!\brief Public API for Polyconf
+//!\file writer.hpp
+//!\brief Configuration writing interface for Polyconf
 //!\author Colin J.D. Stewart
 //
 // -------------------------------------------------------------
 
-#ifndef POLYCONF_HPP
-#define POLYCONF_HPP
+#ifndef POLYCONF_WRITER_HPP
+#define POLYCONF_WRITER_HPP
 
 // inbuilt
 #include <string>
 
 // internal
-#include "types.hpp"
 #include "config.hpp"
-#include "writer.hpp"
+#include "types.hpp"
 
 namespace POLYCONF
 {
-    //!\brief Load configuration from string
-    CONFIG load_string(const std::string& input, FORMAT format);
-
-    //!\brief Load configuration from file
-    CONFIG load_file(const std::string& file, FORMAT format);
-
     //!\brief Save configuration to string
     std::string save_string(const CONFIG& config, FORMAT format);
 
@@ -32,4 +25,4 @@ namespace POLYCONF
     bool save_file(const CONFIG& config, const std::string& file, FORMAT format);
 }
 
-#endif // POLYCONF_HPP
+#endif // POLYCONF_WRITER_HPP

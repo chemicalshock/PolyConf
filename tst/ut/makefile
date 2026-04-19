@@ -13,6 +13,25 @@ X86CPPTARGETSOL ?=
 # SUT targets
 # ------------------------------
 
+# parsers
+
+X86CPPTARGETSOL += acf_parser_SUT.cpp.so
+acf_parser_SUT.cpp.so,SRCS := parser/acf_parser.cpp
+acf_parser_SUT.cpp.so,DEPS :=
+acf_parser_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
+
+X86CPPTARGETSOL += acf_writer_SUT.cpp.so
+acf_writer_SUT.cpp.so,SRCS := parser/acf_writer.cpp
+acf_writer_SUT.cpp.so,DEPS :=
+acf_writer_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
+
+X86CPPTARGETSOL += xml_parser_SUT.cpp.so
+xml_parser_SUT.cpp.so,SRCS := parser/xml_parser.cpp
+xml_parser_SUT.cpp.so,DEPS :=
+xml_parser_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
+
+# core
+
 X86CPPTARGETSOL += config_SUT.cpp.so
 config_SUT.cpp.so,SRCS := config.cpp
 config_SUT.cpp.so,DEPS := \
@@ -32,17 +51,11 @@ loader_SUT.cpp.so,SRCS := loader.cpp
 loader_SUT.cpp.so,DEPS :=
 loader_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
 
-# parsers
-
-X86CPPTARGETSOL += acf_parser_SUT.cpp.so
-acf_parser_SUT.cpp.so,SRCS := parser/acf_parser.cpp
-acf_parser_SUT.cpp.so,DEPS :=
-acf_parser_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
-
-X86CPPTARGETSOL += xml_parser_SUT.cpp.so
-xml_parser_SUT.cpp.so,SRCS := parser/xml_parser.cpp
-xml_parser_SUT.cpp.so,DEPS :=
-xml_parser_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
+X86CPPTARGETSOL += writer_SUT.cpp.so
+writer_SUT.cpp.so,SRCS := writer.cpp
+writer_SUT.cpp.so,DEPS := \
+	acf_writer_SUT.cpp.so
+writer_SUT.cpp.so,CPPFLAGS = $(GLOBAL_CPPFLAGS)
 
 # ------------------------------
 # Test targets
@@ -85,6 +98,15 @@ TEST_LOADER,USRLIBS := \
 	loader_SUT.cpp.so
 TEST_LOADER,CPPFLAGS = $(GLOBAL_CPPFLAGS)
 TEST_LOADER,LDFLAGS =
+
+X86CPPTARGET += TEST_WRITER
+TEST_WRITER,SRCS := test_writer.cpp
+TEST_WRITER,USRLIBS := \
+	config_SUT.cpp.so \
+	loader_SUT.cpp.so \
+	writer_SUT.cpp.so
+TEST_WRITER,CPPFLAGS = $(GLOBAL_CPPFLAGS)
+TEST_WRITER,LDFLAGS =
 
 #
 # parser tests

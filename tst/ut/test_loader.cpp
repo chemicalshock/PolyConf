@@ -53,7 +53,7 @@ SHOCKTEST_GOODWEATHER(load_string_auto_detect_ignores_leading_whitespace)
 
 SHOCKTEST_GOODWEATHER(load_file_auto_detects_acf_from_extension)
 {
-    POLYCONF::CONFIG config = POLYCONF::load_file("resources/acf/auto_detect_basic.acf", POLYCONF::FORMAT::AUTO);
+    POLYCONF::CONFIG config = POLYCONF::load_file("ref/acf/auto_detect_basic.acf", POLYCONF::FORMAT::AUTO);
 
     EXPECT_EQ(config.get_string("account.name", ""), "colin");
     EXPECT_EQ(config.get_bool("account.developer", false), true);
@@ -61,7 +61,7 @@ SHOCKTEST_GOODWEATHER(load_file_auto_detects_acf_from_extension)
 
 SHOCKTEST_GOODWEATHER(load_file_auto_detects_xml_from_extension)
 {
-    POLYCONF::CONFIG config = POLYCONF::load_file("resources/xml/auto_detect_basic.xml", POLYCONF::FORMAT::AUTO);
+    POLYCONF::CONFIG config = POLYCONF::load_file("ref/xml/auto_detect_basic.xml", POLYCONF::FORMAT::AUTO);
 
     EXPECT_EQ(config.get_string("account.name", "colin"), "colin");
     EXPECT_EQ(config.get_bool("account.developer", false), true);
@@ -69,19 +69,19 @@ SHOCKTEST_GOODWEATHER(load_file_auto_detects_xml_from_extension)
 
 SHOCKTEST_GOODWEATHER(load_file_auto_detect_falls_back_when_no_extension)
 {
-    POLYCONF::CONFIG config = POLYCONF::load_file("resources/xml/auto_detect_no_ext", POLYCONF::FORMAT::AUTO);
+    POLYCONF::CONFIG config = POLYCONF::load_file("ref/xml/auto_detect_no_ext", POLYCONF::FORMAT::AUTO);
     EXPECT_EQ(config.get_int("config.value", 0), 7);
 }
 
 SHOCKTEST_GOODWEATHER(load_file_auto_detect_falls_back_when_extension_unknown)
 {
-    POLYCONF::CONFIG config = POLYCONF::load_file("resources/acf/auto_detect_unknown.ext", POLYCONF::FORMAT::AUTO);
+    POLYCONF::CONFIG config = POLYCONF::load_file("ref/acf/auto_detect_unknown.ext", POLYCONF::FORMAT::AUTO);
     EXPECT_EQ(config.get_string("server.addr", ""), "localhost");
 }
 
 SHOCKTEST_BADWEATHER(load_file_missing_file_returns_empty_config)
 {
-    POLYCONF::CONFIG config = POLYCONF::load_file("resources/acf/does_not_exist.acf", POLYCONF::FORMAT::AUTO);
+    POLYCONF::CONFIG config = POLYCONF::load_file("ref/acf/does_not_exist.acf", POLYCONF::FORMAT::AUTO);
 
     EXPECT_EQ(config.has("anything"), false);
     EXPECT_EQ(config.count("anything"), static_cast<std::size_t>(0));

@@ -24,6 +24,7 @@ namespace POLYCONF
         bool m_has_value = false;
         std::string m_value;
         std::map<std::string, std::vector<NODE>> m_children;
+        std::vector<std::pair<std::string, std::size_t>> m_child_order;
 
     public:
         //!\brief Default constructor
@@ -72,13 +73,19 @@ namespace POLYCONF
         //!\brief Add named child node
         void add_child(const std::string& name, const NODE& child)
         {
-            m_children[name].push_back(child);
+            std::vector<NODE>& children = m_children[name];
+
+            children.push_back(child);
+            m_child_order.push_back(std::make_pair(name, children.size() - 1));
         }
 
         //!\brief Add named child node (move)
         void add_child(const std::string& name, NODE&& child)
         {
-            m_children[name].push_back(std::move(child));
+            std::vector<NODE>& children = m_children[name];
+
+            children.push_back(std::move(child));
+            m_child_order.push_back(std::make_pair(name, children.size() - 1));
         }
 
         //!\brief Append named child node and return it
@@ -87,6 +94,7 @@ namespace POLYCONF
             std::vector<NODE>& children = m_children[name];
 
             children.push_back(NODE());
+            m_child_order.push_back(std::make_pair(name, children.size() - 1));
 
             return children.back();
         }
@@ -202,6 +210,12 @@ namespace POLYCONF
         const std::map<std::string, std::vector<NODE>>& children() const
         {
             return m_children;
+        }
+
+        //!\brief Access children in insertion order
+        const std::vector<std::pair<std::string, std::size_t>>& child_order() const
+        {
+            return m_child_order;
         }
     };
 }
