@@ -218,21 +218,33 @@ POLYCONF::CONFIG POLYCONF::load_file(const std::string& file, POLYCONF::FORMAT f
 }
 
 //
-//!\brief Merge multiple configuration strings into one
+//!\brief Merge a configuration string into an existing configuration
 //
-POLYCONF::CONFIG POLYCONF::merge_string(const std::string& input, POLYCONF::FORMAT format)
+POLYCONF::CONFIG POLYCONF::merge_string(
+    const POLYCONF::CONFIG& config,
+    const std::string& input,
+    POLYCONF::FORMAT format)
 {
-    POLYCONF::CONFIG config = POLYCONF::load_string(input, format);
+    POLYCONF::CONFIG incoming = POLYCONF::load_string(input, format);
+    POLYCONF::NODE merged_root(config.root());
 
-    return POLYCONF::CONFIG(merge_node_copy(config.root()));
+    merge_node_into(merged_root, incoming.root());
+
+    return POLYCONF::CONFIG(std::move(merged_root));
 }
 
 //
-//!\brief Merge multiple configuration files into one
+//!\brief Merge a configuration file into an existing configuration
 //
-POLYCONF::CONFIG POLYCONF::merge_file(const std::string& file, POLYCONF::FORMAT format)
+POLYCONF::CONFIG POLYCONF::merge_file(
+    const POLYCONF::CONFIG& config,
+    const std::string& file,
+    POLYCONF::FORMAT format)
 {
-    POLYCONF::CONFIG config = POLYCONF::load_file(file, format);
+    POLYCONF::CONFIG incoming = POLYCONF::load_file(file, format);
+    POLYCONF::NODE merged_root(config.root());
 
-    return POLYCONF::CONFIG(merge_node_copy(config.root()));
+    merge_node_into(merged_root, incoming.root());
+
+    return POLYCONF::CONFIG(std::move(merged_root));
 }

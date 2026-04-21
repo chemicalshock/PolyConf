@@ -56,49 +56,66 @@ SHOCKTEST_GOODWEATHER(mvp_xml_basic_smoke)
 
 SHOCKTEST_GOODWEATHER(mvp_merge_string_acf_overwrites_existing_and_keeps_new_nodes)
 {
-    const char* input =
+    const char* base_input =
         ".account\n"
         "name = colin\n"
         "age = 30\n"
-        "\n"
+        "retry = 2\n";
+
+    const char* merge_input =
         ".account\n"
         "name = orim\n"
         "active = true\n"
         ".account.info\n"
         "is_agent = true\n";
 
-    POLYCONF::CONFIG config = POLYCONF::merge_string(input, POLYCONF::FORMAT::ACF);
+    POLYCONF::CONFIG base = POLYCONF::load_string(base_input, POLYCONF::FORMAT::ACF);
+    POLYCONF::CONFIG config = POLYCONF::merge_string(base, merge_input, POLYCONF::FORMAT::ACF);
 
     EXPECT_EQ(config.count("account"), static_cast<std::size_t>(1));
     EXPECT_EQ(config.get_string("account.name", ""), "orim");
     EXPECT_EQ(config.get_int("account.age", 0), 30);
+    EXPECT_EQ(config.get_int("account.retry", 0), 2);
     EXPECT_EQ(config.get_bool("account.active", false), true);
     EXPECT_EQ(config.get_bool("account.info.is_agent", false), true);
 }
 
 SHOCKTEST_GOODWEATHER(mvp_merge_string_xml_overwrites_existing_and_keeps_new_nodes)
 {
-    const char* input =
+    const char* base_input =
         "<config>"
             "<server>"
                 "<host>localhost</host>"
+                "<tls>true</tls>"
             "</server>"
+        "</config>";
+
+    const char* merge_input =
+        "<config>"
             "<server>"
                 "<host>prod</host>"
                 "<port>8080</port>"
             "</server>"
         "</config>";
 
-    POLYCONF::CONFIG config = POLYCONF::merge_string(input, POLYCONF::FORMAT::XML);
+    POLYCONF::CONFIG base = POLYCONF::load_string(base_input, POLYCONF::FORMAT::XML);
+    POLYCONF::CONFIG config = POLYCONF::merge_string(base, merge_input, POLYCONF::FORMAT::XML);
 
     EXPECT_EQ(config.count("config.server"), static_cast<std::size_t>(1));
     EXPECT_EQ(config.get_string("config.server.host", ""), "prod");
     EXPECT_EQ(config.get_int("config.server.port", 0), 8080);
+    EXPECT_EQ(config.get_bool("config.server.tls", false), true);
 }
 
 SHOCKTEST_GOODWEATHER(mvp_merge_file_auto_detects_and_merges_acf)
 {
-    POLYCONF::CONFIG config = POLYCONF::merge_file("ref/acf/merge_basic.acf", POLYCONF::FORMAT::AUTO);
+    const char* base_input =
+        ".account\n"
+        "name = alpha\n"
+        "retry = 2\n";
+
+    POLYCONF::CONFIG base = POLYCONF::load_string(base_input, POLYCONF::FORMAT::ACF);
+    POLYCONF::CONFIG config = POLYCONF::merge_file(base, "ref/acf/merge_basic.acf", POLYCONF::FORMAT::AUTO);
 
     EXPECT_EQ(config.count("account"), static_cast<std::size_t>(1));
     EXPECT_EQ(config.get_string("account.name", ""), "beta");

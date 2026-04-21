@@ -24,11 +24,11 @@ namespace POLYCONF
     //!\brief Load configuration from file
     CONFIG load_file(const std::string& file, FORMAT format);
 
-    //!\brief Merge multiple configuration strings into one
-    CONFIG merge_string(const std::string& input, FORMAT format);
+    //!\brief Merge a configuration string into an existing configuration
+    CONFIG merge_string(const CONFIG& config, const std::string& input, FORMAT format);
 
-    //!\brief Merge multiple configuration files into one
-    CONFIG merge_file(const std::string& file, FORMAT format);
+    //!\brief Merge a configuration file into an existing configuration
+    CONFIG merge_file(const CONFIG& config, const std::string& file, FORMAT format);
 }
 
 #endif // POLYCONF_LOADER_HPP
