@@ -1,0 +1,8 @@
+.account
+name = alpha
+retry = 2
+
+.account
+name = beta
+.account.info
+active = true

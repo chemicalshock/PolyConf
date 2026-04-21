@@ -30,6 +30,12 @@ namespace POLYCONF
 
     //!\brief Save configuration to file
     bool save_file(const CONFIG& config, const std::string& file, FORMAT format);
+
+    //!\brief Merge multiple configuration strings into one
+    CONFIG merge_string(const std::string& input, FORMAT format);
+
+    //!\brief Merge multiple configuration files into one
+    CONFIG merge_file(const std::string& file, FORMAT format);
 }
 
 #endif // POLYCONF_HPP

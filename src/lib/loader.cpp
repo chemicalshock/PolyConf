@@ -25,6 +25,78 @@
 namespace
 {
     //
+    //!\brief Merge one node into another
+    //
+    void merge_node_into(POLYCONF::NODE& target, const POLYCONF::NODE& source);
+
+    //
+    //!\brief Create a merged copy of a node
+    //
+    POLYCONF::NODE merge_node_copy(const POLYCONF::NODE& source)
+    {
+        POLYCONF::NODE merged;
+
+        merge_node_into(merged, source);
+
+        return merged;
+    }
+
+    //
+    //!\brief Merge one node into another
+    //
+    void merge_node_into(POLYCONF::NODE& target, const POLYCONF::NODE& source)
+    {
+        const std::vector<std::string>& comments_before = source.comments_before();
+        const std::vector<std::string>& trailing_comments = source.trailing_comments();
+        const std::vector<std::pair<std::string, std::size_t>>& child_order = source.child_order();
+        std::size_t i = 0;
+
+        if (source.has_value())
+        {
+            target.set_value(source.value());
+        }
+
+        while (i < comments_before.size())
+        {
+            target.add_comment_before(comments_before[i]);
+            ++i;
+        }
+
+        if (source.has_inline_comment())
+        {
+            target.set_inline_comment(source.inline_comment());
+        }
+
+        i = 0;
+
+        while (i < child_order.size())
+        {
+            const std::string& name = child_order[i].first;
+            const POLYCONF::NODE& child = source.children().at(name)[child_order[i].second];
+            POLYCONF::NODE* existing = target.get_last_child(name);
+
+            if (existing == nullptr)
+            {
+                target.add_child(name, merge_node_copy(child));
+            }
+            else
+            {
+                merge_node_into(*existing, child);
+            }
+
+            ++i;
+        }
+
+        i = 0;
+
+        while (i < trailing_comments.size())
+        {
+            target.add_trailing_comment(trailing_comments[i]);
+            ++i;
+        }
+    }
+
+    //
     //!\brief Detect configuration format from file extension
     //
     POLYCONF::FORMAT detect_format_from_extension(const std::string& file)
@@ -143,4 +215,24 @@ POLYCONF::CONFIG POLYCONF::load_file(const std::string& file, POLYCONF::FORMAT f
     }
 
     return POLYCONF::load_string(buffer.str(), detected_format);
+}
+
+//
+//!\brief Merge multiple configuration strings into one
+//
+POLYCONF::CONFIG POLYCONF::merge_string(const std::string& input, POLYCONF::FORMAT format)
+{
+    POLYCONF::CONFIG config = POLYCONF::load_string(input, format);
+
+    return POLYCONF::CONFIG(merge_node_copy(config.root()));
+}
+
+//
+//!\brief Merge multiple configuration files into one
+//
+POLYCONF::CONFIG POLYCONF::merge_file(const std::string& file, POLYCONF::FORMAT format)
+{
+    POLYCONF::CONFIG config = POLYCONF::load_file(file, format);
+
+    return POLYCONF::CONFIG(merge_node_copy(config.root()));
 }
